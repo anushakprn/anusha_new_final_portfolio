@@ -90,7 +90,40 @@ npm run build
 
 This creates an optimized production build in the `build` folder.
 
-## 📁 Project Structure
+## 📧 Formspree Email Functionality Setup
+
+The contact form uses Formspree to send emails directly to your inbox. Follow these steps to set it up:
+
+### 1. Create Formspree Account
+1. Go to [Formspree](https://formspree.io/) and create a free account
+2. Verify your email address
+
+### 2. Create a New Form
+1. In your Formspree dashboard, click "Create a new form"
+2. Give it a name like "Portfolio Contact Form"
+3. Copy the form endpoint URL (looks like: `https://formspree.io/f/xxxxxxxx`)
+
+### 3. Configure Environment Variable
+Update your `.env` file with the endpoint URL:
+```env
+REACT_APP_FORMSPREE_ENDPOINT=https://formspree.io/f/your_form_id_here
+```
+
+### 4. Test the Contact Form
+1. Start your development server: `npm start`
+2. Fill out the contact form and submit
+3. Check your email for the message
+
+**Note**: Formspree is much simpler than EmailJS - no templates or services needed, just one endpoint URL!
+
+### 6. Test the Contact Form
+1. Start your development server: `npm start`
+2. Fill out the contact form and submit
+3. Check your email for the message
+
+**Note**: The contact form will show error messages if EmailJS is not properly configured.
+
+## �📁 Project Structure
 
 ```
 portfolio/

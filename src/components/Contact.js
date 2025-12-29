@@ -8,6 +8,8 @@ const Contact = () => {
     subject: '',
     message: ''
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitStatus, setSubmitStatus] = useState(null);
 
   const handleChange = (e) => {
     setFormData({
@@ -16,17 +18,57 @@ const Contact = () => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission here
-    console.log('Form submitted:', formData);
-    alert('Message sent successfully!');
-    setFormData({
-      name: '',
-      email: '',
-      subject: '',
-      message: ''
-    });
+    setIsSubmitting(true);
+    setSubmitStatus(null);
+
+    try {
+      // Formspree configuration - Replace with your actual endpoint
+      const formspreeEndpoint = process.env.REACT_APP_FORMSPREE_ENDPOINT || 'https://formspree.io/f/YOUR_FORM_ID';
+
+      if (formspreeEndpoint.includes('YOUR_FORM_ID')) {
+        throw new Error('Formspree not configured. Please set up your Formspree account and update the .env file.');
+      }
+
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('email', formData.email);
+      formDataToSend.append('subject', formData.subject);
+      formDataToSend.append('message', formData.message);
+
+      console.log('Sending form data to:', formspreeEndpoint);
+
+      const response = await fetch(formspreeEndpoint, {
+        method: 'POST',
+        body: formDataToSend,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+
+      if (response.ok) {
+        setSubmitStatus('success');
+        setFormData({
+          name: '',
+          email: '',
+          subject: '',
+          message: ''
+        });
+      } else {
+        throw new Error('Form submission failed');
+      }
+    } catch (error) {
+      console.error('Form submission failed:', error);
+      setSubmitStatus('error');
+
+      // Show specific error message
+      if (error.message.includes('Formspree not configured')) {
+        alert('Formspree is not configured yet. Please follow the setup instructions in the FORMSPREE_SETUP.md file.');
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const contactInfo = [
@@ -165,10 +207,36 @@ const Contact = () => {
                 required
               ></textarea>
             </div>
-            <button type="submit" className="submit-btn">
-              <i className="fas fa-paper-plane"></i> Send Message
+            <button type="submit" className="submit-btn" disabled={isSubmitting}>
+              <i className="fas fa-paper-plane"></i> {isSubmitting ? 'Sending...' : 'Send Message'}
             </button>
           </form>
+          
+          {submitStatus === 'success' && (
+            <div className="success-message" style={{ 
+              color: '#28a745', 
+              marginTop: '15px', 
+              padding: '10px', 
+              border: '1px solid #28a745', 
+              borderRadius: '5px',
+              backgroundColor: '#d4edda'
+            }}>
+              <i className="fas fa-check-circle"></i> Message sent successfully! I'll get back to you soon.
+            </div>
+          )}
+          
+          {submitStatus === 'error' && (
+            <div className="error-message" style={{ 
+              color: '#dc3545', 
+              marginTop: '15px', 
+              padding: '10px', 
+              border: '1px solid #dc3545', 
+              borderRadius: '5px',
+              backgroundColor: '#f8d7da'
+            }}>
+              <i className="fas fa-exclamation-circle"></i> Failed to send message. Please try again or contact me directly.
+            </div>
+          )}
         </div>
       </div>
     </div>
